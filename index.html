@@ -92,10 +92,8 @@
 
 		/////////
 		void main() {
-
-			
-			vDisplacement = 16.0 * cnoise( .01 * position + time/50. );
-			vPosDelta = vec3(vDisplacement, vDisplacement, vDisplacement); 
+			vDisplacement = 24.0 * cnoise( .01 * position + time/10. );
+			vPosDelta = vec3(vDisplacement / 5., vDisplacement/ 5., vDisplacement/ 5.); 
 			vec4 mvPosition = modelViewMatrix * vec4( vec3(position.x  + vPosDelta.x, position.y + vPosDelta.y, position.z + vPosDelta.z) , 1.0 );
 			
 			float pSize = vDisplacement * ( 300.0 / - mvPosition.z );
@@ -122,10 +120,10 @@
 
 		void main() {
 			if ( length( gl_PointCoord - vec2( 0.5, 0.5 ) ) > 0.475 ) discard;
-			vec4 color=vec4(mix(colorA, colorB, vDisplacement), .15 );
+			vec4 color=vec4(mix(colorA, colorB, vDisplacement), .25 );
 			gl_FragColor = color;
 		
-			  #ifdef USE_LOGDEPTHBUF_EXT
+			  	#ifdef USE_LOGDEPTHBUF_EXT
 					float depth = gl_FragDepthEXT / gl_FragCoord.w;
 				#else
 					float depth = gl_FragCoord.z / gl_FragCoord.w;
@@ -155,8 +153,9 @@
 		let camera, scene, renderer;
 		let clock, delta;
 
-		let material_a;
-		let particles, count = 0;
+		let material_a, material_b;
+
+		let particles, torusWire, count = 0;
 
 		let mouseX = 0, mouseY = 0, mouseMoving = false;
 
@@ -176,12 +175,12 @@
 			camera.lookAt(new THREE.Vector3(-1, 0, 0));
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color(0x000022);
-			scene.fog = new THREE.Fog(0x000022, 1, 400);
+			scene.fog = new THREE.Fog(0x000022, 0, 250);
 
 			material_a = new THREE.ShaderMaterial({
 
 				uniforms: {
-					colorA: { value: new THREE.Color(0x0d20f0) },
+					colorA: { value: new THREE.Color(0x0d15f0) },
 					colorB: { value: new THREE.Color(0x1f00ff) },
 					colorC: { value: new THREE.Color(0xffffff) },
 					fogColor: { type: "c", value: scene.fog.color },
@@ -194,16 +193,19 @@
 				blending: THREE.AdditiveBlending,
 				depthTest: false,
 				transparent: true,
-				fog: { value: true }
+				fog: { value: true },
+				wireframe:true
 
 			});
 
 			//
 			const geometry = new THREE.TorusKnotGeometry(300, 80, 800, 80, 2, 3);
-			// geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-			// geometry.setAttribute('scale', new THREE.BufferAttribute(scales, 1));
+			
 			particles = new THREE.Points(geometry, material_a);
+			// torusWire = new THREE.Mesh( new THREE.WireframeGeometry( geometry ));
+			
 			scene.add(particles);
+			// scene.add(torusWire)
 
 			//
 
@@ -259,10 +261,12 @@
 				material_a.uniforms.time.value += delta
 				camera.position.setY(delta * Math.sin(delta))
 				particles.rotation.z += delta * 0.02;
+				// torusWire.rotation.z += delta * 0.02;
 				if (mouseMoving) {
-					// camera.rotation.y = mouseX * 0.00001;
 					camera.position.x = mouseY * 0.005;
-					camera.position.z = mouseX * 0.005;
+					camera.position.z = - mouseX * 0.005;
+					// torusWire.position.x = mouseY * 0.005;
+					// torusWire.position.z = - mouseX * 0.005;
 				}
 
 				render();
@@ -273,14 +277,7 @@
 		}
 
 		function render() {
-
-			let incrX = (mouseX - camera.position.x) * .0005
-			if (camera.position.x + incrX < 0) {
-				incrX = incrX;
-			}
-			
 			renderer.render(scene, camera);
-
 		}
 
 	</script>
