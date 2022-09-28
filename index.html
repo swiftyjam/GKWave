@@ -94,10 +94,15 @@
 		void main() {
 
 			
-			vDisplacement = 16.0 * cnoise( .01 * position + time/20. );
+			vDisplacement = 16.0 * cnoise( .01 * position + time/50. );
 			vPosDelta = vec3(vDisplacement, vDisplacement, vDisplacement); 
 			vec4 mvPosition = modelViewMatrix * vec4( vec3(position.x  + vPosDelta.x, position.y + vPosDelta.y, position.z + vPosDelta.z) , 1.0 );
-			gl_PointSize = vDisplacement*( 300.0 / - mvPosition.z ) * 1.;
+			
+			float pSize = vDisplacement * ( 300.0 / - mvPosition.z );
+			if(pSize < 2.){
+				pSize = 2.;
+			}
+			gl_PointSize = pSize;
 			gl_Position = projectionMatrix * mvPosition;
 
 		}
@@ -117,7 +122,7 @@
 
 		void main() {
 			if ( length( gl_PointCoord - vec2( 0.5, 0.5 ) ) > 0.475 ) discard;
-			vec4 color=vec4(mix(colorA, colorB, vDisplacement), 0.1 );
+			vec4 color=vec4(mix(colorA, colorB, vDisplacement), .15 );
 			gl_FragColor = color;
 		
 			  #ifdef USE_LOGDEPTHBUF_EXT
@@ -166,16 +171,16 @@
 			container = document.getElementById("canvas-here");
 			camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
 			camera.position.z = 0;
-			camera.position.x = 80;
+			camera.position.x = 20;
 			camera.position.y = 0;
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x000022 );
-			scene.fog = new THREE.Fog( 0x000022, 200, 400 );
+			scene.fog = new THREE.Fog( 0x000022, 1, 400 );
 
 			 material_a = new THREE.ShaderMaterial({
 
 				uniforms: {
-					colorA: { value: new THREE.Color(0x0000f0) },
+					colorA: { value: new THREE.Color(0x0d20f0) },
 					colorB: { value: new THREE.Color(0x1f00ff) },
 					colorC: { value: new THREE.Color(0xffffff) },
 					fogColor:    { type: "c", value: scene.fog.color },
@@ -193,7 +198,7 @@
 			});
 
 			//
-			const geometry = new THREE.TorusKnotGeometry( 300, 80, 1000, 100, 2,3 );
+			const geometry = new THREE.TorusKnotGeometry( 300, 80, 800, 80, 2,3 );
 			// geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 			// geometry.setAttribute('scale', new THREE.BufferAttribute(scales, 1));
 			particles = new THREE.Points(geometry, material_a);
