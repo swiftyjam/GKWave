@@ -2,7 +2,7 @@
 	<div id="canvas-here">
 	</div>
 	<script type="x-shader/x-vertex" id="vertexshader">
-		
+
 		attribute float scale;
 		uniform float time;
 		varying float vDisplacement;
@@ -153,39 +153,40 @@
 
 		let container;
 		let camera, scene, renderer;
-		let clock,delta;
+		let clock, delta;
 
 		let material_a;
 		let particles, count = 0;
 
-		let mouseX = 0, mouseY = 0;
+		let mouseX = 0, mouseY = 0, mouseMoving = false;
 
 		let windowHalfX = window.innerWidth / 2;
 		let windowHalfY = window.innerHeight / 2;
 
 		init();
-		
+
 
 		function init() {
 
 			container = document.getElementById("canvas-here");
 			camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
 			camera.position.z = 0;
-			camera.position.x = 20;
+			camera.position.x = 0;
 			camera.position.y = 0;
+			camera.lookAt(new THREE.Vector3(-1, 0, 0));
 			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0x000022 );
-			scene.fog = new THREE.Fog( 0x000022, 1, 400 );
+			scene.background = new THREE.Color(0x000022);
+			scene.fog = new THREE.Fog(0x000022, 1, 400);
 
-			 material_a = new THREE.ShaderMaterial({
+			material_a = new THREE.ShaderMaterial({
 
 				uniforms: {
 					colorA: { value: new THREE.Color(0x0d20f0) },
 					colorB: { value: new THREE.Color(0x1f00ff) },
 					colorC: { value: new THREE.Color(0xffffff) },
-					fogColor:    { type: "c", value: scene.fog.color },
-					fogNear:     { type: "f", value: scene.fog.near },
-					fogFar:      { type: "f", value: scene.fog.far },
+					fogColor: { type: "c", value: scene.fog.color },
+					fogNear: { type: "f", value: scene.fog.near },
+					fogFar: { type: "f", value: scene.fog.far },
 					time: { value: 0.0 }
 				},
 				vertexShader: document.getElementById('vertexshader').textContent,
@@ -193,12 +194,12 @@
 				blending: THREE.AdditiveBlending,
 				depthTest: false,
 				transparent: true,
-				fog: {value:true}
+				fog: { value: true }
 
 			});
 
 			//
-			const geometry = new THREE.TorusKnotGeometry( 300, 80, 800, 80, 2,3 );
+			const geometry = new THREE.TorusKnotGeometry(300, 80, 800, 80, 2, 3);
 			// geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 			// geometry.setAttribute('scale', new THREE.BufferAttribute(scales, 1));
 			particles = new THREE.Points(geometry, material_a);
@@ -206,7 +207,7 @@
 
 			//
 
-			renderer = new THREE.WebGLRenderer({ antialias: true, alpha:true });
+			renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 			renderer.setPixelRatio(window.devicePixelRatio);
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			renderer.setClearColor(0x000022, 1.0);
@@ -241,8 +242,10 @@
 
 			if (event.isPrimary === false) return;
 
-			mouseX = event.clientX - windowHalfX;
-			mouseY = event.clientY - windowHalfY;
+			mouseMoving = true
+			var mouseTolerance = 1.
+			mouseX = event.clientX - windowHalfX / windowHalfX * mouseTolerance;
+			mouseY = event.clientY - windowHalfY / windowHalfY * mouseTolerance;
 
 		}
 
@@ -254,27 +257,28 @@
 			if (delta > 1 / 60) {
 
 				material_a.uniforms.time.value += delta
-				// camera.lookAt(new THREE.Vector3(0,0,0))
-
 				camera.position.setY(delta * Math.sin(delta))
-				particles.rotation.x += delta * -0.000;
 				particles.rotation.z += delta * 0.02;
+				if (mouseMoving) {
+					// camera.rotation.y = mouseX * 0.00001;
+					camera.position.x = mouseY * 0.005;
+					camera.position.z = mouseX * 0.005;
+				}
 
 				render();
 				delta %= (1 / 60)
+				mouseMoving = false;
 			}
 			requestAnimationFrame(update);
 		}
 
 		function render() {
 
-			// camera.position.x += (mouseX - camera.position.x) * .05;
-			// camera.position.y += (- mouseY - camera.position.y) * .05;
-			camera.lookAt(scene.position);
-
-			// particles.geometry.attributes.position.needsUpdate = true;
-			// particles.geometry.attributes.scale.needsUpdate = true;
-
+			let incrX = (mouseX - camera.position.x) * .0005
+			if (camera.position.x + incrX < 0) {
+				incrX = incrX;
+			}
+			
 			renderer.render(scene, camera);
 
 		}
