@@ -94,7 +94,7 @@
 
 		/////////
 		void main() {
-			vDisplacement = 24.0 * cnoise( .01 * position + time/10. );
+			vDisplacement = 24.0 * cnoise( .01 * position + time/20. );
 			vPosDelta = vec3(vDisplacement / 5., vDisplacement/ 5., vDisplacement/ 5.) * scaleDeform; 
 			vec4 mvPosition = modelViewMatrix * vec4( vec3(position.x  + vPosDelta.x, position.y + vPosDelta.y, position.z + vPosDelta.z) , 1.0 );
 			
@@ -202,8 +202,8 @@
 			camera.position.y = 0;
 			camera.lookAt(new THREE.Vector3(-1, 0, 0));
 			scene = new THREE.Scene();
-			scene.background = new THREE.Color(0x000022);
-			scene.fog = new THREE.Fog(0x000022, 0, 250);
+			scene.background = new THREE.Color(0x0D1017);
+			scene.fog = new THREE.Fog(0x0D1017, 0, 250);
 
 			material_a = new THREE.ShaderMaterial({
 
@@ -264,7 +264,7 @@
 			renderer.setClearColor(0x000022, 1.0);
 			container.appendChild(renderer.domElement);
 			container.style.touchAction = 'none';
-			container.addEventListener('pointermove', onPointerMove);
+			window.addEventListener('pointermove', onPointerMove);
 
 			//
 
@@ -310,8 +310,8 @@
 				material_a.uniforms.time.value += delta
 				material_b.uniforms.time.value += delta
 				camera.position.setY(delta * Math.sin(delta))
-				particles.rotation.z += delta * 0.02;
-				torusWire.rotation.z += delta * 0.02;
+				particles.rotation.z += delta * 0.01;
+				torusWire.rotation.z += delta * 0.01;
 				if (mouseMoving) {
 					
 					camera.position.x = torusWire.position.x = -mouseY * 0.005;
