@@ -1,5 +1,6 @@
-<body style="margin:0; height:8000px; overflow-x: hidden;" ></body>
-	<div id="canvas-here" style="position: fixed;"">
+
+	<div id="canvas-here" style="position: fixed; z-index:-999;overflow: hidden;
+    width: 100%;">
 	</div>
 	<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -98,7 +99,7 @@
 			vDisplacement = 24.0 * cnoise( .008 * position + time/20. );
 			vDisplacementBig = 72.0 * cnoise( .0025 * position  );
 			float dimmer = 1.;
-			vPosDelta = vec3(.0 , vDisplacement/ dimmer + vDisplacementBig, vDisplacement/ dimmer + vDisplacementBig) * scaleDeform;
+			vPosDelta = vec3(.0 , 0., vDisplacement/ dimmer + vDisplacementBig) * scaleDeform;
 			vec4 mvPosition = modelViewMatrix * vec4( vec3(position.x  + vPosDelta.x, position.y + vPosDelta.y, position.z + vPosDelta.z) , 1.0 );
 
 			float pSize = vDisplacement * ( 300.0 / - mvPosition.z ) / 1.;
@@ -124,7 +125,7 @@
 
 		void main() {
 			if ( length( gl_PointCoord - vec2( 0.5, 0.5 ) ) > 0.475 ) discard;
-			vec4 color=vec4(mix(colorA, colorB, vDisplacement), .1 );
+			vec4 color=vec4(mix(colorA, colorB, vDisplacement), .5 );
 			gl_FragColor = color;
 
 			  	#ifdef USE_LOGDEPTHBUF_EXT
@@ -150,7 +151,7 @@
 
 		void main() {
 
-			vec4 color=vec4(mix(colorA, colorB, vDisplacement), .2);
+			vec4 color=vec4(mix(colorA, colorB, vDisplacement), .6);
 			gl_FragColor = color;
 
 			  	#ifdef USE_LOGDEPTHBUF_EXT
@@ -200,18 +201,18 @@
 			canvasElement = document.getElementById("canvas-here");
 			camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
 			camera.position.z = 0;
-			camera.position.x = - 90;
+			camera.position.x = 0;
 			camera.position.y = 0;
 			camera.lookAt(new THREE.Vector3(-100, 0, 0));
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color(0x0D1017);
-			scene.fog = new THREE.Fog(0x0D1017, 0, 280);
+			scene.fog = new THREE.Fog(0x00000, -800, 600);
 
 			material_a = new THREE.ShaderMaterial({
 
 				uniforms: {
-					//#0d13f0
-					//#aaff22
+					//#0017f5,#0037fe
+					//#1017ef,#1027ff
 					colorA: { value: new THREE.Color(0x0017f5) },
 					colorB: { value: new THREE.Color(0x1017ef) },
 					colorC: { value: new THREE.Color(0xffffff) },
@@ -235,7 +236,7 @@
 					colorA: { value: new THREE.Color(0x000000) },
 					colorB: { value: new THREE.Color(0xffff12) },
 					colorC: { value: new THREE.Color(0xffffff) },
-					scaleDeform: { value: 1 },
+					scaleDeform: { value: 2 },
 					fogColor: { type: "c", value: scene.fog.color },
 					fogNear: { type: "f", value: scene.fog.near },
 					fogFar: { type: "f", value: scene.fog.far },
@@ -251,10 +252,10 @@
 
 			});
 
-			//  const geometry = new THREE.TorusKnotGeometry(300, 80, 600, 200, 1, 1);
-			//  const geometry_b = new THREE.TorusKnotGeometry(300, 90, 40, 10, 1, 1);
-			 const geometry = new THREE.TorusGeometry(300, 60, 250, 700);
-			 const geometry_b = new THREE.TorusGeometry(300, 75, 7, 20);
+			const geometry = new THREE.TorusKnotGeometry(300, 40, 1200, 150, 2, 3);
+			const geometry_b = new THREE.TorusKnotGeometry(300, 50, 40, 10, 2, 3);
+			//  const geometry = new THREE.TorusGeometry(300, 60, 250, 700);
+			//  const geometry_b = new THREE.TorusGeometry(300, 75, 7, 20);
 
 			particles = new THREE.Points(geometry, material_a);
 			torusWire = new THREE.Mesh(new THREE.WireframeGeometry(geometry_b), material_b);
@@ -270,7 +271,7 @@
 			canvasElement.appendChild(renderer.domElement);
 			canvasElement.style.touchAction = 'none';
 			window.addEventListener('pointermove', onPointerMove);
-			container = document
+			container = window
 			container.addEventListener('scroll', onScroll, false);
 			//
 
@@ -310,9 +311,9 @@
 			var st = window.pageYOffset || document.documentElement.scrollTop; // Credits: "https://github.com/qeremy/so/blob/master/so.dom.js#L426"
 			if (st > lastScrollTop){
 				// downscroll code
-				rotAccel+=0.002
+				rotAccel-= rotAccel > -0.015 ? 0.002 : 0
 			} else {
-				rotAccel-=0.002
+				rotAccel+= rotAccel < 0.015 ? 0.002 : 0
 				// upscroll code
 			}
 			
@@ -337,7 +338,7 @@
 				// camera.rotation.y+= rotAccel;
 
 				if (mouseMoving) {
-					 camera.position.x = mouseY * 0.01 - 90;
+					 camera.position.x = mouseY * 0.01;
 					 camera.position.z =  - mouseX * 0.01;
 				}
 
@@ -367,4 +368,3 @@
 		}
 
 	</script>
-</body>
