@@ -1,6 +1,6 @@
 
-<div id="canvas-here" style="position: fixed; z-index:-999;overflow: hidden;
-width: 100%;">
+<div id="canvas-here" style="position: fixed; z-index:-999; overflow: hidden;
+width: 100%; opacity:1.6;">
 	<script type="x-shader/x-vertex" id="vertexshader">
 
 		attribute float scale;
@@ -92,11 +92,11 @@ width: 100%;">
 
 		/////////
 		void main() {
-			vDisplacement = 24.0 * cnoise( .01 * position + time/50. );
+			vDisplacement = 24.0 * cnoise( .01 * position + time/20. );
 			vPosDelta = vec3(vDisplacement / 5., vDisplacement/ 5., vDisplacement/ 5.); 
 			vec4 mvPosition = modelViewMatrix * vec4( vec3(position.x  + vPosDelta.x, position.y + vPosDelta.y, position.z + vPosDelta.z) , 1.0 );
 			
-			float pSize = vDisplacement * ( 300.0 / - mvPosition.z );
+			float pSize = vDisplacement * ( 300.0 / - mvPosition.z ) / 1.;
 			if(pSize < 2.){
 				pSize = 2.;
 			}
@@ -120,7 +120,7 @@ width: 100%;">
 
 		void main() {
 			if ( length( gl_PointCoord - vec2( 0.5, 0.5 ) ) > 0.475 ) discard;
-			vec4 color=vec4(mix(colorA, colorB, vDisplacement), .25 );
+			vec4 color=vec4(mix(colorA, colorB, vDisplacement ), .20 );
 			gl_FragColor = color;
 		
 			  	#ifdef USE_LOGDEPTHBUF_EXT
@@ -181,7 +181,7 @@ width: 100%;">
 
 				uniforms: {
 					colorA: { value: new THREE.Color(0x0d15f0) },
-					colorB: { value: new THREE.Color(0x1f00ff) },
+					colorB: { value: new THREE.Color(0x1000ff) },
 					colorC: { value: new THREE.Color(0xffffff) },
 					fogColor: { type: "c", value: scene.fog.color },
 					fogNear: { type: "f", value: scene.fog.near },
@@ -260,7 +260,7 @@ width: 100%;">
 
 				material_a.uniforms.time.value += delta
 				camera.position.setY(delta * Math.sin(delta))
-				particles.rotation.z += delta * 0.02;
+				// particles.rotation.z += delta * 0.02;
 				// torusWire.rotation.z += delta * 0.02;
 				render();
 				delta %= (1 / 60)
