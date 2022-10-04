@@ -1,6 +1,6 @@
-<body style="margin:0">
-	<div id="canvas-here">
-	</div>
+
+<div id="canvas-here" style="position: fixed; z-index:-999;overflow: hidden;
+width: 100%;">
 	<script type="x-shader/x-vertex" id="vertexshader">
 
 		attribute float scale;
@@ -92,7 +92,7 @@
 
 		/////////
 		void main() {
-			vDisplacement = 24.0 * cnoise( .01 * position + time/10. );
+			vDisplacement = 24.0 * cnoise( .01 * position + time/50. );
 			vPosDelta = vec3(vDisplacement / 5., vDisplacement/ 5., vDisplacement/ 5.); 
 			vec4 mvPosition = modelViewMatrix * vec4( vec3(position.x  + vPosDelta.x, position.y + vPosDelta.y, position.z + vPosDelta.z) , 1.0 );
 			
@@ -174,8 +174,8 @@
 			camera.position.y = 0;
 			camera.lookAt(new THREE.Vector3(-1, 0, 0));
 			scene = new THREE.Scene();
-			scene.background = new THREE.Color(0x000022);
-			scene.fog = new THREE.Fog(0x000022, 0, 250);
+			scene.background = new THREE.Color(0x0D1017);
+			scene.fog = new THREE.Fog(0x000011, 0, 250);
 
 			material_a = new THREE.ShaderMaterial({
 
@@ -262,13 +262,6 @@
 				camera.position.setY(delta * Math.sin(delta))
 				particles.rotation.z += delta * 0.02;
 				// torusWire.rotation.z += delta * 0.02;
-				if (mouseMoving) {
-					camera.position.x = mouseY * 0.005;
-					camera.position.z = - mouseX * 0.005;
-					// torusWire.position.x = mouseY * 0.005;
-					// torusWire.position.z = - mouseX * 0.005;
-				}
-
 				render();
 				delta %= (1 / 60)
 				mouseMoving = false;
@@ -281,4 +274,3 @@
 		}
 
 	</script>
-</body>
